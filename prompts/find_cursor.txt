@@ -1,0 +1,6 @@
+There is a white circle with a black dot inside it in the image. It represents the mouse cursor.
+There are gridlines to help you determine the coordinates of the mouse cursor. Each grid square is 100 pixels by 100 pixels.
+The coordinates of the top left corner of the screenshot is (0, 0) and the coordinates of the bottom right corner is ({width}, {height}).
+What are the coordinates of the mouse cursor?
+Screenshot Width: __WIDTH__
+Screenshot Height: __HEIGHT__

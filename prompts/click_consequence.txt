@@ -1,0 +1,2 @@
+In this screenshot of my desktop, the mouse is represented by a black dot inside a white circle.
+Can you tell me what will happen if I do a left click at the current position of the mouse?

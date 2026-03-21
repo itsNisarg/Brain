@@ -30,13 +30,23 @@ def take_screenshot(filename: str) -> tuple[str, Image.Image, tuple[int, int]]:
 
     # Draw a visible crosshair/dot at cursor position
     draw = ImageDraw.Draw(screenshot)
-    r = 10
-    draw.ellipse([mouse_x - r, mouse_y - r, mouse_x + r, mouse_y + r],
-                 outline="red", fill="red", width=3)
-    draw.line([mouse_x - r, mouse_y, mouse_x + r, mouse_y],
-              fill="white", width=2)
-    draw.line([mouse_x, mouse_y - r, mouse_x, mouse_y + r],
-              fill="white", width=2)
+    r = 15
+    # draw.ellipse([max(mouse_x - r, 0), max(mouse_y - r, 0),
+    #               min(mouse_x + r, screenshot.width),
+    #               min(mouse_y + r, screenshot.height)],
+    #              outline="black", fill="white", width=5)
+
+    draw.ellipse(
+        [
+            max(mouse_x - r, 0),
+            max(mouse_y - r, 0),
+            min(mouse_x + r, screenshot.width),
+            min(mouse_y + r, screenshot.height),
+        ],
+        outline="white",
+        fill="black",
+        width=7,
+    )
 
     timestamp = datetime.now(tz=timezone.utc).strftime("%Y%m%d%H%M%S")
 
@@ -51,6 +61,26 @@ def take_screenshot(filename: str) -> tuple[str, Image.Image, tuple[int, int]]:
     print(f"Screenshot saved to {file_path}")
 
     return file_path, screenshot, (mouse_x, mouse_y)
+
+
+def draw_grid(image_path: "str | Image.Image", cell_size: int = 100) -> Image.Image:
+    """Draw a grid on the given image."""
+    if isinstance(image_path, str):
+        image = Image.open(image_path)
+    else:
+        image = image_path
+    draw = ImageDraw.Draw(image)
+    width, height = image.size
+
+    # Vertical lines
+    for x in range(0, width+1, cell_size):
+        draw.line([(x, 0), (x, height)], fill="red", width=1)
+
+    # Horizontal lines
+    for y in range(0, height+1, cell_size):
+        draw.line([(0, y), (width, y)], fill="red", width=1)
+
+    return image
 
 
 screenshot_tool = {
