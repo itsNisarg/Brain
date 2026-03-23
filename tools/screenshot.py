@@ -73,11 +73,11 @@ def draw_grid(image_path: "str | Image.Image", cell_size: int = 100) -> Image.Im
     width, height = image.size
 
     # Vertical lines
-    for x in range(0, width+1, cell_size):
+    for x in range(0, width + 1, cell_size):
         draw.line([(x, 0), (x, height)], fill="red", width=1)
 
     # Horizontal lines
-    for y in range(0, height+1, cell_size):
+    for y in range(0, height + 1, cell_size):
         draw.line([(0, y), (width, y)], fill="red", width=1)
 
     return image

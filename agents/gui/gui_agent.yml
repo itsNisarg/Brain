@@ -1,0 +1,12 @@
+name: GUI Agent
+instructions: gui_prompt.md
+tools:
+  - name: screenshot
+    description: Takes a screenshot of the current screen and saves it as a file. Returns the file path of the saved screenshot.
+    parameters: []
+  - name: draw_grid
+    description: Draws a grid on the input image to help with spatial reasoning. The grid divides the image into equal-sized cells and labels them with coordinates. Returns the file path of the new image with the grid.
+    parameters:
+      - name: image_path
+        type: string
+        description: The file path of the input image on which to draw the grid. This should be the screenshot taken by the "screenshot" tool.
