@@ -6,6 +6,14 @@ using the pyautogui library.
 import pyautogui
 
 
+def mouse_position() -> tuple[int, int]:
+    """Returns the current position of the mouse cursor as (x, y) coordinates.
+    Returns:
+        tuple: A tuple containing the x and y coordinates of the mouse cursor.
+    """
+    return pyautogui.position()
+
+
 def left_click(x: int, y: int) -> None:
     """Performs a left click at the specified (x, y) coordinates.
     Args:

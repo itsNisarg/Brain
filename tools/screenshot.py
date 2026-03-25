@@ -82,12 +82,3 @@ def draw_grid(image_path: "str | Image.Image", cell_size: int = 100) -> Image.Im
 
     return image
 
-
-screenshot_tool = {
-    "type": "function",
-    "functions": {
-        "name": "take_screenshot",
-        "description": "Take a screenshot of the current screen and\
-         save it to a specific location.",
-    },
-}
