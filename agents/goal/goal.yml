@@ -1,4 +1,0 @@
-name: Goal Agent
-instructions_file: goal/goal_prompt.md
-response_format_file: goal/goal_response.py
-response_format_class: GoalResponse
