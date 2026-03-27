@@ -1,0 +1,136 @@
+2026-03-27 19:38:14 | INFO     | Session folder created: ./interactions/sessions/session_20260327_193814
+2026-03-27 19:38:14 | INFO     | Hello from brain!
+2026-03-27 19:38:14 | INFO     | Initializing context providers...
+2026-03-27 19:38:14 | INFO     | Initialized context providers...
+2026-03-27 19:38:14 | INFO     | Initializing GoalAgent...
+2026-03-27 19:38:15 | INFO     | Running agent with query: I want to create a task in Microsoft To Do
+2026-03-27 19:38:15 | INFO     | Retrieving messages from GoalContextProvider with key: goal_session, found 6 messages
+2026-03-27 19:38:17 | INFO     | Request URL: 'https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0/.well-known/openid-configuration'
+Request method: 'GET'
+Request headers:
+    'User-Agent': 'azsdk-python-identity/1.25.3 Python/3.14.3 (Windows-11-10.0.26200-SP0)'
+No body was attached to the request
+2026-03-27 19:38:18 | INFO     | Response status: 200
+Response headers:
+    'Date': 'Fri, 27 Mar 2026 14:08:30 GMT'
+    'Content-Type': 'application/json; charset=utf-8'
+    'Content-Length': '1964'
+    'Connection': 'keep-alive'
+    'Cache-Control': 'max-age=86400, private'
+    'Strict-Transport-Security': 'REDACTED'
+    'X-Content-Type-Options': 'REDACTED'
+    'Access-Control-Allow-Origin': 'REDACTED'
+    'Access-Control-Allow-Methods': 'REDACTED'
+    'P3P': 'REDACTED'
+    'x-ms-request-id': '2da2e23a-d6d7-416b-bc46-9e7ca1b54c00'
+    'x-ms-ests-server': 'REDACTED'
+    'x-ms-srs': 'REDACTED'
+    'Content-Security-Policy-Report-Only': 'REDACTED'
+    'X-XSS-Protection': 'REDACTED'
+    'Set-Cookie': 'REDACTED'
+    'X-Cache': 'REDACTED'
+2026-03-27 19:38:19 | INFO     | Request URL: 'https://login.microsoftonline.com/common/discovery/instance?api-version=REDACTED&authorization_endpoint=REDACTED'
+Request method: 'GET'
+Request headers:
+    'Accept': 'application/json'
+    'User-Agent': 'azsdk-python-identity/1.25.3 Python/3.14.3 (Windows-11-10.0.26200-SP0)'
+No body was attached to the request
+2026-03-27 19:38:19 | INFO     | Response status: 200
+Response headers:
+    'Date': 'Fri, 27 Mar 2026 14:08:31 GMT'
+    'Content-Type': 'application/json; charset=utf-8'
+    'Content-Length': '945'
+    'Connection': 'keep-alive'
+    'Cache-Control': 'max-age=86400, private'
+    'Strict-Transport-Security': 'REDACTED'
+    'X-Content-Type-Options': 'REDACTED'
+    'Access-Control-Allow-Origin': 'REDACTED'
+    'Access-Control-Allow-Methods': 'REDACTED'
+    'P3P': 'REDACTED'
+    'x-ms-request-id': '4056cf02-9b14-4e07-aa7d-478984c10800'
+    'x-ms-ests-server': 'REDACTED'
+    'x-ms-srs': 'REDACTED'
+    'Content-Security-Policy-Report-Only': 'REDACTED'
+    'X-XSS-Protection': 'REDACTED'
+    'Set-Cookie': 'REDACTED'
+    'X-Cache': 'REDACTED'
+2026-03-27 19:38:19 | INFO     | InteractiveBrowserBrokerCredential.get_token_info succeeded
+2026-03-27 19:38:21 | INFO     | HTTP Request: POST https://susbi-poc-resource.services.ai.azure.com/api/projects/susbi-poc/openai/v1/responses "HTTP/1.1 200 OK"
+2026-03-27 19:38:23 | INFO     | 7 Chunks received: {
+
+2026-03-27 19:38:23 | INFO     | 8 Chunks received:  
+2026-03-27 19:38:23 | INFO     | 9 Chunks received:  "
+2026-03-27 19:38:23 | INFO     | 10 Chunks received: goal
+2026-03-27 19:38:23 | INFO     | 11 Chunks received: ":
+2026-03-27 19:38:23 | INFO     | 12 Chunks received:  "
+2026-03-27 19:38:23 | INFO     | 13 Chunks received: Create
+2026-03-27 19:38:23 | INFO     | 14 Chunks received:  a
+2026-03-27 19:38:23 | INFO     | 15 Chunks received:  new
+2026-03-27 19:38:23 | INFO     | 16 Chunks received:  task
+2026-03-27 19:38:23 | INFO     | 17 Chunks received:  in
+2026-03-27 19:38:23 | INFO     | 18 Chunks received:  Microsoft
+2026-03-27 19:38:23 | INFO     | 19 Chunks received:  To
+2026-03-27 19:38:23 | INFO     | 20 Chunks received:  Do
+2026-03-27 19:38:23 | INFO     | 21 Chunks received: .",
+
+2026-03-27 19:38:23 | INFO     | 22 Chunks received:  
+2026-03-27 19:38:23 | INFO     | 23 Chunks received:  "
+2026-03-27 19:38:23 | INFO     | 24 Chunks received: ass
+2026-03-27 19:38:23 | INFO     | 25 Chunks received: um
+2026-03-27 19:38:23 | INFO     | 26 Chunks received: ptions
+2026-03-27 19:38:23 | INFO     | 27 Chunks received: ":
+2026-03-27 19:38:23 | INFO     | 28 Chunks received:  "
+2026-03-27 19:38:23 | INFO     | 29 Chunks received: The
+2026-03-27 19:38:23 | INFO     | 30 Chunks received:  user
+2026-03-27 19:38:23 | INFO     | 31 Chunks received:  has
+2026-03-27 19:38:23 | INFO     | 32 Chunks received:  access
+2026-03-27 19:38:23 | INFO     | 33 Chunks received:  to
+2026-03-27 19:38:23 | INFO     | 34 Chunks received:  Microsoft
+2026-03-27 19:38:23 | INFO     | 35 Chunks received:  To
+2026-03-27 19:38:23 | INFO     | 36 Chunks received:  Do
+2026-03-27 19:38:23 | INFO     | 37 Chunks received:  via
+2026-03-27 19:38:23 | INFO     | 38 Chunks received:  the
+2026-03-27 19:38:23 | INFO     | 39 Chunks received:  web
+2026-03-27 19:38:23 | INFO     | 40 Chunks received:  or
+2026-03-27 19:38:23 | INFO     | 41 Chunks received:  mobile
+2026-03-27 19:38:23 | INFO     | 42 Chunks received: /
+2026-03-27 19:38:23 | INFO     | 43 Chunks received: desktop
+2026-03-27 19:38:23 | INFO     | 44 Chunks received:  app
+2026-03-27 19:38:23 | INFO     | 45 Chunks received:  and
+2026-03-27 19:38:23 | INFO     | 46 Chunks received:  is
+2026-03-27 19:38:23 | INFO     | 47 Chunks received:  signed
+2026-03-27 19:38:23 | INFO     | 48 Chunks received:  into
+2026-03-27 19:38:23 | INFO     | 49 Chunks received:  a
+2026-03-27 19:38:23 | INFO     | 50 Chunks received:  valid
+2026-03-27 19:38:23 | INFO     | 51 Chunks received:  Microsoft
+2026-03-27 19:38:23 | INFO     | 52 Chunks received:  account
+2026-03-27 19:38:23 | INFO     | 53 Chunks received: .",
+
+2026-03-27 19:38:23 | INFO     | 54 Chunks received:  
+2026-03-27 19:38:23 | INFO     | 55 Chunks received:  "
+2026-03-27 19:38:23 | INFO     | 56 Chunks received: constraints
+2026-03-27 19:38:23 | INFO     | 57 Chunks received: ":
+2026-03-27 19:38:23 | INFO     | 58 Chunks received:  "
+2026-03-27 19:38:23 | INFO     | 59 Chunks received: Requires
+2026-03-27 19:38:23 | INFO     | 60 Chunks received:  a
+2026-03-27 19:38:23 | INFO     | 61 Chunks received:  Microsoft
+2026-03-27 19:38:24 | INFO     | 62 Chunks received:  account
+2026-03-27 19:38:24 | INFO     | 63 Chunks received: ,
+2026-03-27 19:38:24 | INFO     | 64 Chunks received:  access
+2026-03-27 19:38:24 | INFO     | 65 Chunks received:  to
+2026-03-27 19:38:24 | INFO     | 66 Chunks received:  Microsoft
+2026-03-27 19:38:24 | INFO     | 67 Chunks received:  To
+2026-03-27 19:38:24 | INFO     | 68 Chunks received:  Do
+2026-03-27 19:38:24 | INFO     | 69 Chunks received: ,
+2026-03-27 19:38:24 | INFO     | 70 Chunks received:  and
+2026-03-27 19:38:24 | INFO     | 71 Chunks received:  internet
+2026-03-27 19:38:24 | INFO     | 72 Chunks received:  connectivity
+2026-03-27 19:38:24 | INFO     | 73 Chunks received:  for
+2026-03-27 19:38:24 | INFO     | 74 Chunks received:  synchronization
+2026-03-27 19:38:24 | INFO     | 75 Chunks received: ."
+
+2026-03-27 19:38:24 | INFO     | 76 Chunks received: }
+2026-03-27 19:38:24 | INFO     | Saving 8 messages to GlobalAuditProvider for session_id: goal_session
+2026-03-27 19:38:24 | INFO     | Saving 2 messages to GoalContextProvider under key: goal_session
+2026-03-27 19:38:24 | INFO     | Structured data extracted.
+2026-03-27 19:38:24 | INFO     | Agent run completed.
