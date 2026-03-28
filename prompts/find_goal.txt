@@ -1,3 +1,0 @@
-Where do I need to click to open the file explorer?
-Can you also give me the coordinates of the place where I need to click?
-The screenshot is __WIDTH__ pixels wide and __HEIGHT__ pixels high.

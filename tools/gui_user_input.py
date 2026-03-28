@@ -1,27 +1,36 @@
 import customtkinter as ctk
+import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class GUIUserInput(ctk.CTk):
-    def __init__(self, title="Agent requires human input", text="Do you have a TODO App?", width=400, height=100):
+    def __init__(
+        self,
+        title="Agent requires human input",
+        text="Do you have a TODO App?",
+        width=400,
+        height=100,
+    ):
         super().__init__()
 
         self.geometry(f"{width}x{height}")
         self.title(title)
         self.attributes("-topmost", True)
 
-        # Configure grid: Row 1 (the textbox) will expand to fill space
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1) 
+        # Handle window closure gracefully (the "X" button)
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.is_running = True
 
-        # 1. Header Label (Silver/White text)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+
         self.label = ctk.CTkLabel(
-            self, 
-            text=text, 
-            text_color="#C5C9D6", 
-            font=("Consolas", 16, "bold")
+            self, text=text, text_color="#C5C9D6", font=("Consolas", 16, "bold")
         )
         self.label.grid(row=0, column=0, padx=20, pady=(20, 10), sticky="w")
 
-        # 2. Text Area (Deep Navy with subtle border)
         self.textbox = ctk.CTkTextbox(
             self,
             fg_color="#FEFEFF",
@@ -30,12 +39,11 @@ class GUIUserInput(ctk.CTk):
             border_width=2,
             scrollbar_button_color="#233554",
             scrollbar_button_hover_color="#64FFDA",
-            font=("Consolas", 13)
+            font=("Consolas", 13),
         )
         self.textbox.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
         self.textbox.focus_set()
 
-        # 3. Submit Button (Ocean Blue with Glow-like hover)
         self.button = ctk.CTkButton(
             self,
             text="Submit",
@@ -45,23 +53,51 @@ class GUIUserInput(ctk.CTk):
             font=("Consolas", 14, "bold"),
             corner_radius=8,
             height=40,
-            command=self.submit
+            command=self.submit,
         )
         self.button.grid(row=2, column=0, padx=20, pady=20)
 
         self.user_input = None
 
     def submit(self):
-        # Note: Textbox requires start and end indexes. "1.0" is start, "end-1c" removes trailing newline.
         self.user_input = self.textbox.get("1.0", "end-1c")
-        self.destroy()
+        self.is_running = False
 
-def get_input():
-    app = GUIUserInput(width=500, height=250)
-    app.mainloop()
-    return app.user_input
+    def on_close(self):
+        self.is_running = False
+
+
+async def get_input(text: str = "Do you have a TODO App?") -> str | None:
+
+    logger.info("Waiting for user...")
+
+    app = GUIUserInput(text=text, width=400, height=200)
+
+    # Process GUI events and yield control to user's event loop
+    while app.is_running:
+        try:
+            app.update()
+        except Exception:
+            break
+        await asyncio.sleep(0.02)  # ~50 FPS refresh rate
+
+    result = app.user_input
+
+    try:
+        app.destroy()
+    except Exception:
+        pass  # Ignore any late-firing Tcl errors during final teardown
+
+    logger.info(f"User input received: {result}")
+
+    return result
+
 
 # Testing it
 if __name__ == "__main__":
-    result = get_input()
-    print(f"Captured Text:\n{result}")
+
+    async def main():
+        user_input = await get_input("Please enter your response:")
+        print(f"Async loop continued! User said: {user_input}")
+
+    asyncio.run(main())

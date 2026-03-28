@@ -10,8 +10,14 @@ warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 logger = logging.getLogger(__name__)
 
 
-from agent_framework import (AgentSession, BaseHistoryProvider, Content,
-                             InMemoryHistoryProvider, Message)
+from agent_framework import (
+    AgentSession,
+    BaseHistoryProvider,
+    Content,
+    InMemoryHistoryProvider,
+    Message,
+    FunctionTool
+)
 from agent_framework.azure import AzureOpenAIResponsesClient
 from azure.identity.aio import VisualStudioCodeCredential
 from dotenv import load_dotenv
@@ -24,15 +30,17 @@ class GoalResponseFormat(BaseModel):
     """
 
     goal: str = ""
-    assumptions: str | None = None
-    constraints: str | None = None
+    assumptions: str = ""
+    constraints: str = ""
 
 
 class GoalAgent:
+
     def __init__(
         self,
         prompt_path: str | None = "prompts/goal_prompt.md",
         context_providers: list[BaseHistoryProvider | InMemoryHistoryProvider] = [],
+        tools: list[tool] = [],
     ) -> None:
 
         logger.info("Initializing GoalAgent...")
@@ -69,6 +77,7 @@ class GoalAgent:
     async def run(
         self, query: str | None, session: AgentSession | None
     ) -> GoalResponseFormat:
+        
         user_message = Message(
             role="user", contents=[Content.from_text(text=query if query else "Hi!")]
         )

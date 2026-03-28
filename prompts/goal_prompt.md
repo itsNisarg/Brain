@@ -10,6 +10,7 @@
 ## Required Keys: goal, assumptions, constraints
 ## Value Data Types: string, string, string
 ## Example:
+```json
 {
     "goal": "Open Teams on desktop.",
     "assumptions": "User has teams installed on system.",
