@@ -135,7 +135,8 @@ class ScreenAnalyzerContextProvider(BaseHistoryProvider):
             query = Query()
             condition = query[key].exists()
             docs = self.screen_analysis_history.search(cond=condition)
-            rows = [row for doc in docs if key in doc for row in doc[key]][-1]  # Get the most recent screen analysis for this session
+            rows = [row for doc in docs if key in doc for row in doc[key]]
+            rows = rows[-1] if rows else []  # Only return the most recent screen analysis result for context
         logger.info(f"Retrieved {len(rows)} messages")
         return [Message.from_dict(row) for row in rows]
 

@@ -101,7 +101,7 @@ class ScreenAnalyzerAgent:
             contents=[
                 Content.from_text(
                     text=f"""Screen dimensions: {screen_width}x{screen_height} with top left as (0,0) and bottom right as ({screen_width},{screen_height}).
-                    Current Mouse position: ({mouse_x}, {mouse_y}) represented as a red dot insidde a white circle on the screen."""
+                    Current Mouse position: ({mouse_x}, {mouse_y}) represented as a red dot inside a white circle on the screen."""
                 ),
             ],
         )
