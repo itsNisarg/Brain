@@ -41,7 +41,7 @@ class ScreenAnalysisResponseFormat(BaseModel):
     mouse_at_right_pos: bool | None = None
 
 
-class ScreenAnalyzerAgent:
+class ScreenAnalysisAgent:
     def __init__(
         self,
         prompt_path: str | None = "screen_analyze.md",
@@ -49,7 +49,7 @@ class ScreenAnalyzerAgent:
         tools: list[FunctionTool] = [],
     ) -> None:
 
-        logger.info("Initializing ScreenAnalyzerAgent...")
+        logger.info("Initializing ScreenAnalysisAgent...")
         load_dotenv()  # Load environment variables from .env file
 
         if (
@@ -68,7 +68,7 @@ class ScreenAnalyzerAgent:
             deployment_name=os.environ["CHAT_AGENT"],
             credential=self._credential,
         ).as_agent(
-            name="ScreenAnalyzerAgent",
+            name="ScreenAnalysisAgent",
             instructions=self.prompt,
             context_providers=context_providers,
             tools=tools,
@@ -160,13 +160,13 @@ if __name__ == "__main__":
 
     load_dotenv()  # Load environment variables from .env file
 
-    screen_analyzer_agent = ScreenAnalyzerAgent()
+    screen_analysis_agent = ScreenAnalysisAgent()
     query = "Create a new task in Microsoft To Do."
     image, image_grid, screen_width, screen_height, mouse_x, mouse_y, filepath = (
         take_screenshot("default_session")
     )
     asyncio.run(
-        screen_analyzer_agent.run(
+        screen_analysis_agent.run(
             query=query,
             screenshot=image,
             session=None,

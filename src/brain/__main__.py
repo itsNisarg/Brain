@@ -9,10 +9,10 @@ from dotenv import load_dotenv
 from tinydb import TinyDB
 
 from brain.agents.goal_agent import GoalAgent
-from brain.agents.screen_agent import ScreenAnalyzerAgent
+from brain.agents.screen_agent import ScreenAnalysisAgent
 from brain.context_history.history_provider import (GlobalAuditProvider,
                                                     GoalContextProvider,
-                                                    ScreenAnalyzerContextProvider)
+                                                    ScreenAnalysisContextProvider)
 from brain.tools.screenshot import take_screenshot
 
 # Create a logger instance for this module
@@ -49,7 +49,7 @@ async def main(session_name: str) -> None:
     goal_context_provider = GoalContextProvider(db=goal_db)
 
     # Screen Analysis Context Provider
-    screen_context_provider = ScreenAnalyzerContextProvider(db=screen_db)
+    screen_context_provider = ScreenAnalysisContextProvider(db=screen_db)
 
     logger.info("Initialized context providers...")
 
@@ -62,13 +62,13 @@ async def main(session_name: str) -> None:
     goal_result = await goal_agent.run(query, goal_session)
     logger.info(f"Goal agent result: {goal_result}")
 
-    # Screen Analyzer Agent
-    screen_analyzer_agent = ScreenAnalyzerAgent(context_providers=[screen_context_provider, audit], tools=[])
-    screen_analysis_session = screen_analyzer_agent.agent.create_session(session_id=f"screen_analysis_{session_name}")
+    # Screen Analysis Agent
+    screen_analysis_agent = ScreenAnalysisAgent(context_providers=[screen_context_provider, audit], tools=[])
+    screen_analysis_session = screen_analysis_agent.agent.create_session(session_id=f"screen_analysis_{session_name}")
     screenshot, screenshot_grid, screen_width, screen_height, mouse_x, mouse_y, filepath = take_screenshot(session_name)
 
-    logger.info("Running screen analyzer agent...")
-    screen_analysis_result = await screen_analyzer_agent.run(
+    logger.info("Running screen analysis agent...")
+    screen_analysis_result = await screen_analysis_agent.run(
         query=goal_result.goal,
         screenshot=screenshot,
         session=screen_analysis_session,

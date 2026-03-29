@@ -107,7 +107,7 @@ class GoalContextProvider(BaseHistoryProvider):
         self.goal_history.insert({key: [m.to_dict() for m in messages]})
 
 
-class ScreenAnalyzerContextProvider(BaseHistoryProvider):
+class ScreenAnalysisContextProvider(BaseHistoryProvider):
     
     def __init__(self, db: TinyDB) -> None:
         super().__init__("screen_analysis_history", load_messages=True)
@@ -128,7 +128,7 @@ class ScreenAnalyzerContextProvider(BaseHistoryProvider):
             .get(self.source_id, {})
             .get("history_key", session_id or "default")
         )
-        logger.info(f"Retrieving messages from ScreenAnalyzerContextProvider with key: {key}")
+        logger.info(f"Retrieving messages from ScreenAnalysisContextProvider with key: {key}")
         if not key:
             rows = []
         else:
@@ -156,5 +156,5 @@ class ScreenAnalyzerContextProvider(BaseHistoryProvider):
             )
         else:
             key = session_id or "default"
-        logger.info(f"Saving {len(messages)} messages to ScreenAnalyzerContextProvider under key: {key}")
+        logger.info(f"Saving {len(messages)} messages to ScreenAnalysisContextProvider under key: {key}")
         self.screen_analysis_history.insert({key: [m.to_dict() for m in messages]})
