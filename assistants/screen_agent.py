@@ -1,5 +1,5 @@
 import importlib.util
-import io
+import asyncio
 import json
 import logging
 import os
@@ -17,6 +17,7 @@ from agent_framework import (
     Content,
     InMemoryHistoryProvider,
     Message,
+    FunctionTool
 )
 from agent_framework.azure import AzureAIClient, AzureOpenAIResponsesClient
 from azure.ai.projects.aio import AIProjectClient
@@ -24,6 +25,7 @@ from azure.identity.aio import VisualStudioCodeCredential
 from dotenv import load_dotenv
 from PIL import Image
 from pydantic import BaseModel
+from tools.screenshot import take_screenshot
 
 
 class ScreenAnalysisResponseFormat(BaseModel):
@@ -42,6 +44,7 @@ class ScreenAnalyzerAgent:
         self,
         prompt_path: str | None = "prompts/screen_analyze.md",
         context_providers: list[BaseHistoryProvider | InMemoryHistoryProvider] = [],
+        tools: list[FunctionTool] = [],
     ) -> None:
 
         logger.info("Initializing GoalAgent...")
@@ -62,6 +65,7 @@ class ScreenAnalyzerAgent:
             name="ScreenAnalyzerAgent",
             instructions=self.prompt,
             context_providers=context_providers,
+            tools=tools
         )
 
     async def __aenter__(self):
@@ -76,11 +80,12 @@ class ScreenAnalyzerAgent:
         return self.agent.create_session(session_id=session_id)
 
     async def run(
-        self, query: str | None, screenshot: Image.Image , session: AgentSession | None
+        self, query: str | None, screenshot: bytes | None, session: AgentSession | None
     ) -> ScreenAnalysisResponseFormat:
         
         user_message = Message(
-            role="user", contents=[Content.from_text(text=query if query else "Hi!")]
+            role="user", contents=[Content.from_text(text=query if query else "Hi!"),
+                                   Content.from_data(data=screenshot if screenshot else b"", media_type="image/png")]
         )
 
         result = await self.agent.run(
@@ -106,3 +111,9 @@ class ScreenAnalyzerAgent:
             raise ValueError(
                 "Expected structured data in the response, but none was found."
             )
+
+if __name__ == "__main__":
+    screen_analyzer_agent = ScreenAnalyzerAgent()
+    query = "Create a new task in Microsoft To Do."
+    image, image_grid, mouse_loc, filepath = take_screenshot("interactions/sessions/default_session/screenshots/")
+    asyncio.run(screen_analyzer_agent.run(query=query, screenshot=image, session=None))

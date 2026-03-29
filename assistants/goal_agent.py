@@ -40,7 +40,7 @@ class GoalAgent:
         self,
         prompt_path: str | None = "prompts/goal_prompt.md",
         context_providers: list[BaseHistoryProvider | InMemoryHistoryProvider] = [],
-        tools: list[tool] = [],
+        tools: list[FunctionTool] = [],
     ) -> None:
 
         logger.info("Initializing GoalAgent...")
@@ -61,6 +61,7 @@ class GoalAgent:
             name="GoalAgent",
             instructions=self.prompt,
             context_providers=context_providers,
+            tools=tools,
         )
 
     async def __aenter__(self):

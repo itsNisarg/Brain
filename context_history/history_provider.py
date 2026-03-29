@@ -76,6 +76,7 @@ class GoalContextProvider(BaseHistoryProvider):
             .get(self.source_id, {})
             .get("history_key", session_id or "default")
         )
+        logger.info(f"Retrieving messages from GoalContextProvider with key: {key}")
         if not key:
             rows = []
         else:
@@ -83,7 +84,7 @@ class GoalContextProvider(BaseHistoryProvider):
             condition = query[key].exists()
             docs = self.goal_history.search(cond=condition)
             rows = [row for doc in docs if key in doc for row in doc[key]]
-        logger.info(f"Retrieving messages from GoalContextProvider with key: {key}, found {len(rows)} messages")
+        logger.info(f"Found {len(rows)} messages")
         return [Message.from_dict(row) for row in rows]
 
     async def save_messages(
@@ -104,3 +105,55 @@ class GoalContextProvider(BaseHistoryProvider):
             key = session_id or "default"
         logger.info(f"Saving {len(messages)} messages to GoalContextProvider under key: {key}")
         self.goal_history.insert({key: [m.to_dict() for m in messages]})
+
+
+class ScreenAnalyzerContextProvider(BaseHistoryProvider):
+    
+    def __init__(self, db: TinyDB) -> None:
+        super().__init__("screen_analysis_history", load_messages=True)
+        if db is None:
+            db = TinyDB(".interactions/auto_history.json")
+        self._db = db
+        self.screen_analysis_history = self._db.table("screen_analysis_history")
+
+    async def get_messages(
+        self,
+        session_id: str | None,
+        *,
+        state: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> list[Message]:
+        key = (
+            (state or {})
+            .get(self.source_id, {})
+            .get("history_key", session_id or "default")
+        )
+        logger.info(f"Retrieving messages from ScreenAnalyzerContextProvider with key: {key}")
+        if not key:
+            rows = []
+        else:
+            query = Query()
+            condition = query[key].exists()
+            docs = self.screen_analysis_history.search(cond=condition)
+            rows = [row for doc in docs if key in doc for row in doc[key]][-1]  # Get the most recent screen analysis for this session
+        logger.info(f"Retrieved {len(rows)} messages")
+        return [Message.from_dict(row) for row in rows]
+
+    async def save_messages(
+        self,
+        session_id: str | None,
+        messages: Sequence[Message],
+        *,
+        state: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        if not messages:
+            return
+        if state is not None:
+            key = state.setdefault(self.source_id, {}).setdefault(
+                "history_key", session_id or "default"
+            )
+        else:
+            key = session_id or "default"
+        logger.info(f"Saving {len(messages)} messages to ScreenAnalyzerContextProvider under key: {key}")
+        self.screen_analysis_history.insert({key: [m.to_dict() for m in messages]})
