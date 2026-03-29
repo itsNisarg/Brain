@@ -5,7 +5,6 @@ description = "An amateur CUA implementation."
 readme = "README.md"
 requires-python = ">=3.14"
 
-[project.dependencies]
 dependencies = [
     "pillow",
     "pydantic",

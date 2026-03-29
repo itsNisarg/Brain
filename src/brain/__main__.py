@@ -1,15 +1,17 @@
 import asyncio
-import os
 import logging
-from assistants.goal_agent import GoalAgent
-from agent_framework import BaseHistoryProvider, Message, InMemoryHistoryProvider
-
+import os
 from datetime import datetime
+from dotenv import load_dotenv
+
+from agent_framework import (BaseHistoryProvider, InMemoryHistoryProvider,
+                             Message)
+from context_history.history_provider import (GlobalAuditProvider,
+                                              GoalContextProvider)
 from tinydb import TinyDB
 
-from context_history.history_provider import GoalContextProvider, GlobalAuditProvider
-
-
+from brain.agents.goal_agent import GoalAgent
+from brain.tools.screenshot import take_screenshot
 
 # Create a logger instance for this module
 logger = logging.getLogger(__name__)
@@ -18,24 +20,34 @@ logger = logging.getLogger(__name__)
 async def main():
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    session_name = f"./interactions/sessions/session_{timestamp}"
-    print(f"Creating folder: {session_name}")
-    os.makedirs(session_name, exist_ok=True)  # Create a folder for this session
+    session_name = f"session_{timestamp}"
+
+    os.makedirs(f"./sessions/{session_name}", exist_ok=True)  # Create a folder for this session
+    os.makedirs(f"./sessions/{session_name}/screenshots", exist_ok=True) 
 
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)-8s | %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
         handlers=[
-            logging.FileHandler(f"{session_name}/brain.log"),
+            logging.FileHandler(f"./sessions/{session_name}/brain.log"),
             logging.StreamHandler()
         ]
     )
 
-    audit_db = TinyDB(f"{session_name}/history.json")  # Create a TinyDB instance for this session
-    goal_db = TinyDB(f"./interactions/goals/history.json")  # Separate DB for goal context
+    logger.info(f"Created session: {session_name}")
 
-    logger.info(f"Session folder created: {session_name}")
+    logger.info("Setting up conversation history...")
+    audit_db = TinyDB(f"./sessions/{session_name}/history.json")  # Create a TinyDB instance for this session
+
+    logger.info("Setting up goal context database...")
+    goal_db = TinyDB(f"./learnings/goals/history.json")  # Separate DB for goal context
+
+    logger.info("Setting up screen analysis context database...")
+    screen_db = TinyDB(f"./learnings/screen_analysis/screen_history.json")  # Separate DB for screen analysis context
+
+    logger.info("Setup complete. Starting agent...")
+
     logger.info("Hello from brain!")
     print("Hello from brain!")
 
@@ -54,4 +66,16 @@ async def main():
     
 
 if __name__ == "__main__":
+    logger.info("Checking env file for API keys...")
+    if not os.path.exists(".env"):
+        logger.warning(".env file not found. Please create a .env file with the necessary API keys.")
+        print("Warning: .env file not found. Please create a .env file with the necessary API keys.")
+    else:
+        logger.info(".env file found.")
+        print(".env file found.")
+
+    logger.info("Loading environment variables from .env file...")
+    load_dotenv()
+    logger.info("Environment variables loaded. Starting main function...")
+
     asyncio.run(main())

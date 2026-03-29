@@ -44,7 +44,6 @@ class GoalAgent:
     ) -> None:
 
         logger.info("Initializing GoalAgent...")
-        load_dotenv()  # Load environment variables from .env file
 
         if prompt_path is not None and os.path.exists(prompt_path):
             with open("prompts/goal_prompt.md", "r", encoding="utf-8") as f:
@@ -63,6 +62,8 @@ class GoalAgent:
             context_providers=context_providers,
             tools=tools,
         )
+
+        logger.info("GoalAgent initialized.")
 
     async def __aenter__(self):
         await self.agent.__aenter__()
@@ -109,6 +110,8 @@ class GoalAgent:
 
 
 if __name__ == "__main__":
+    load_dotenv()  # Load environment variables from .env file
+    
     goal_agent = GoalAgent()
     query = "I want to activate my PIM roles in Azure."
     asyncio.run(goal_agent.run(query, session=None))

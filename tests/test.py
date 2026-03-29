@@ -1,1 +1,1 @@
-from agent_tools.screenshot import take_screenshot
+from brain.tools.screenshot import take_screenshot

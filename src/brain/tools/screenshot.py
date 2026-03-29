@@ -1,12 +1,13 @@
 """Tool to take screenshots of the current screen and
-save them to a specific location."""
+save them."""
 
+import logging
 import os
 from datetime import datetime, timezone
 from io import BytesIO
-import logging
 
 import pyautogui
+from agent_framework import tool
 from PIL import Image, ImageDraw
 
 logger = logging.getLogger(__name__)
@@ -27,7 +28,10 @@ def convert_image_to_bytes(image: Image.Image) -> bytes:
     return img_byte_arr.getvalue()
 
 
-def take_screenshot(folder: str, grid_size: int = 100) -> tuple[bytes, bytes, tuple[int, int], str]:
+@tool
+def take_screenshot(
+    folder: str, grid_size: int = 100
+) -> tuple[bytes, bytes, tuple[int, int], str]:
     """Take a screenshot of the current screen, draw a crosshair at the mouse position,
     overlay a grid, and save the screenshot to a specified folder.
 
@@ -38,7 +42,7 @@ def take_screenshot(folder: str, grid_size: int = 100) -> tuple[bytes, bytes, tu
     Returns:
         tuple[bytes, bytes, tuple[int, int], str]: A tuple containing the screenshot bytes, grid screenshot bytes,
         mouse position as (x, y), and the file path of the saved screenshot.
-        
+
     Example:
         screenshot_bytes, grid_screenshot_bytes, mouse_position, file_path = take_screenshot("session_20240601_120000")
     """
@@ -87,12 +91,23 @@ def take_screenshot(folder: str, grid_size: int = 100) -> tuple[bytes, bytes, tu
     logger.info(f"Taking screenshot and saving to {file_path}")
     screenshot.save(file_path)
 
-    logger.info(f"Returning screenshot path: {file_path}, mouse position: ({mouse_x}, {mouse_y})")
+    logger.info(
+        f"Returning screenshot path: {file_path}, mouse position: ({mouse_x}, {mouse_y})"
+    )
 
-    return convert_image_to_bytes(screenshot), convert_image_to_bytes(grid_screenshot), (mouse_x, mouse_y), file_path
+    return (
+        convert_image_to_bytes(screenshot),
+        convert_image_to_bytes(grid_screenshot),
+        (mouse_x, mouse_y),
+        file_path,
+    )
 
 
 if __name__ == "__main__":
-    screenshot_bytes, grid_screenshot_bytes, mouse_position, file_path = take_screenshot("session_20240601_120000")
+    screenshot_bytes, grid_screenshot_bytes, mouse_position, file_path = (
+        take_screenshot("session_20240601_120000")
+    )
     print(f"Screenshot saved to: {file_path}, Mouse position: {mouse_position}")
-    print(f"Screenshot bytes length: {len(screenshot_bytes)}, Grid screenshot bytes length: {len(grid_screenshot_bytes)}")
+    print(
+        f"Screenshot bytes length: {len(screenshot_bytes)}, Grid screenshot bytes length: {len(grid_screenshot_bytes)}"
+    )
