@@ -1,0 +1,1 @@
+from agent_tools.screenshot import take_screenshot
