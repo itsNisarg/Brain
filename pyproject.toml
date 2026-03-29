@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.scripts]
-brain = "brain.__main__:main"   # makes `brain` a CLI command
+brain = "brain.__main__:run"
 
 [build-system]
 requires = ["hatchling"]        # or "flit-core", "setuptools"
