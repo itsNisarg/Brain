@@ -5,19 +5,35 @@ from datetime import datetime
 
 from agent_framework import (BaseHistoryProvider, InMemoryHistoryProvider,
                              Message)
-from context_history.history_provider import (GlobalAuditProvider,
-                                              GoalContextProvider)
 from dotenv import load_dotenv
 from tinydb import TinyDB
 
 from brain.agents.goal_agent import GoalAgent
+from brain.context_history.history_provider import (GlobalAuditProvider,
+                                                    GoalContextProvider)
 from brain.tools.screenshot import take_screenshot
 
 # Create a logger instance for this module
 logger = logging.getLogger(__name__)
 
 
-async def main(audit_db: TinyDB, goal_db: TinyDB):
+async def main():
+    logger.info("Setting up conversation history...")
+
+    audit_db = TinyDB(
+        f"./sessions/{session_name}/history.json"
+    )  # Create a TinyDB instance for this session
+
+    logger.info("Setting up goal context database...")
+    goal_db = TinyDB(f"./learnings/goals/history.json")  # Separate DB for goal context
+
+    logger.info("Setting up screen analysis context database...")
+    screen_db = TinyDB(
+        f"./learnings/screen_analysis/screen_history.json"
+    )  # Separate DB for screen analysis context
+
+    logger.info("Setup complete. Starting agent...")
+
     logger.info("Hello from brain!")
     print("Hello from brain!")
 
@@ -69,23 +85,6 @@ if __name__ == "__main__":
         ],
     )
 
-    logger.info("Setting up conversation history...")
-
-    audit_db = TinyDB(
-        f"./sessions/{session_name}/history.json"
-    )  # Create a TinyDB instance for this session
-
-    logger.info("Setting up goal context database...")
-    goal_db = TinyDB(f"./learnings/goals/history.json")  # Separate DB for goal context
-
-    logger.info("Setting up screen analysis context database...")
-    screen_db = TinyDB(
-        f"./learnings/screen_analysis/screen_history.json"
-    )  # Separate DB for screen analysis context
-
-    logger.info("Setup complete. Starting agent...")
-
-
     logger.info("Checking env file for API keys...")
     if not os.path.exists(".env"):
         logger.warning(
@@ -102,4 +101,4 @@ if __name__ == "__main__":
     load_dotenv()
     logger.info("Environment variables loaded. Starting main function...")
 
-    asyncio.run(main(audit_db=audit_db, goal_db=goal_db))
+    asyncio.run(main())
