@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import warnings
+from importlib.resources import files
 
 os.environ.setdefault("DEFER_PYDANTIC_BUILD", "false")
 warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
@@ -11,8 +12,14 @@ warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 # Create a logger instance for this module
 logger = logging.getLogger(__name__)
 
-from agent_framework import (AgentSession, BaseHistoryProvider, Content,
-                             FunctionTool, InMemoryHistoryProvider, Message)
+from agent_framework import (
+    AgentSession,
+    BaseHistoryProvider,
+    Content,
+    FunctionTool,
+    InMemoryHistoryProvider,
+    Message,
+)
 from agent_framework.azure import AzureAIClient, AzureOpenAIResponsesClient
 from azure.ai.projects.aio import AIProjectClient
 from azure.identity.aio import VisualStudioCodeCredential
@@ -20,7 +27,7 @@ from dotenv import load_dotenv
 from PIL import Image
 from pydantic import BaseModel
 
-from tools.screenshot import take_screenshot
+from brain.tools.screenshot import take_screenshot
 
 
 class ScreenAnalysisResponseFormat(BaseModel):
@@ -37,17 +44,18 @@ class ScreenAnalysisResponseFormat(BaseModel):
 class ScreenAnalyzerAgent:
     def __init__(
         self,
-        prompt_path: str | None = "prompts/screen_analyze.md",
+        prompt_path: str | None = "screen_analyze.md",
         context_providers: list[BaseHistoryProvider | InMemoryHistoryProvider] = [],
         tools: list[FunctionTool] = [],
     ) -> None:
 
-        logger.info("Initializing GoalAgent...")
+        logger.info("Initializing ScreenAnalyzerAgent...")
         load_dotenv()  # Load environment variables from .env file
 
-        if prompt_path is not None and os.path.exists(prompt_path):
-            with open("prompts/goal_prompt.md", "r", encoding="utf-8") as f:
-                self.prompt = f.read()  # Load the prompt template from an external file
+        if (
+            prompt_path is not None and files("brain.prompts").joinpath(prompt_path).is_file()
+        ):
+            self.prompt = files("brain.prompts").joinpath(prompt_path).read_text(encoding="utf-8")
         else:
             self.prompt = "You are a helpful assistant that analyzes the user's screen and provides a caption, description, and other relevant information in a structured format."
 
@@ -116,7 +124,5 @@ class ScreenAnalyzerAgent:
 if __name__ == "__main__":
     screen_analyzer_agent = ScreenAnalyzerAgent()
     query = "Create a new task in Microsoft To Do."
-    image, image_grid, mouse_loc, filepath = take_screenshot(
-        "interactions/sessions/default_session/screenshots/"
-    )
+    image, image_grid, mouse_loc, filepath = take_screenshot("default_session")
     asyncio.run(screen_analyzer_agent.run(query=query, screenshot=image, session=None))

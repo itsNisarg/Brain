@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import warnings
+from importlib.resources import files
 
 os.environ.setdefault("DEFER_PYDANTIC_BUILD", "false")
 warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
@@ -14,9 +15,9 @@ from agent_framework import (
     AgentSession,
     BaseHistoryProvider,
     Content,
+    FunctionTool,
     InMemoryHistoryProvider,
     Message,
-    FunctionTool
 )
 from agent_framework.azure import AzureOpenAIResponsesClient
 from azure.identity.aio import VisualStudioCodeCredential
@@ -38,16 +39,20 @@ class GoalAgent:
 
     def __init__(
         self,
-        prompt_path: str | None = "prompts/goal_prompt.md",
+        prompt_path: str | None = "goal_prompt.md",
         context_providers: list[BaseHistoryProvider | InMemoryHistoryProvider] = [],
         tools: list[FunctionTool] = [],
     ) -> None:
 
         logger.info("Initializing GoalAgent...")
 
-        if prompt_path is not None and os.path.exists(prompt_path):
-            with open("prompts/goal_prompt.md", "r", encoding="utf-8") as f:
-                self.prompt = f.read()  # Load the prompt template from an external file
+        if (
+            prompt_path is not None
+            and files("brain.prompts").joinpath(prompt_path).is_file()
+        ):
+            self.prompt = (
+                files("brain.prompts").joinpath(prompt_path).read_text(encoding="utf-8")
+            )  # Load the prompt template from an external file
         else:
             self.prompt = "You are a helpful assistant that extracts the user's goal, assumptions, and constraints from their query and provides it in a structured format."
 
@@ -79,7 +84,7 @@ class GoalAgent:
     async def run(
         self, query: str | None, session: AgentSession | None
     ) -> GoalResponseFormat:
-        
+
         user_message = Message(
             role="user", contents=[Content.from_text(text=query if query else "Hi!")]
         )
@@ -111,7 +116,7 @@ class GoalAgent:
 
 if __name__ == "__main__":
     load_dotenv()  # Load environment variables from .env file
-    
+
     goal_agent = GoalAgent()
     query = "I want to activate my PIM roles in Azure."
     asyncio.run(goal_agent.run(query, session=None))

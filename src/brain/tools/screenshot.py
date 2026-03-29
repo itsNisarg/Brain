@@ -83,10 +83,10 @@ def take_screenshot(
 
     timestamp = datetime.now(tz=timezone.utc).strftime("%Y%m%d%H%M%S")
 
-    if not os.path.exists(f"interactions/sessions/{folder}/screenshots"):
-        os.makedirs(f"interactions/sessions/{folder}/screenshots")
+    if not os.path.exists(f"sessions/{folder}/screenshots"):
+        os.makedirs(f"sessions/{folder}/screenshots")
 
-    file_path = f"interactions/sessions/{folder}/screenshots/{timestamp}.png"
+    file_path = f"sessions/{folder}/screenshots/{timestamp}.png"
     # Save the screenshot to the specified path
     logger.info(f"Taking screenshot and saving to {file_path}")
     screenshot.save(file_path)
@@ -105,7 +105,7 @@ def take_screenshot(
 
 if __name__ == "__main__":
     screenshot_bytes, grid_screenshot_bytes, mouse_position, file_path = (
-        take_screenshot("session_20240601_120000")
+        take_screenshot("default_session")
     )
     print(f"Screenshot saved to: {file_path}, Mouse position: {mouse_position}")
     print(
