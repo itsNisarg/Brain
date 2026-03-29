@@ -41,7 +41,7 @@ async def main(session_name: str) -> None:
     logger.info("Initialized context providers...")
 
     goal_agent = GoalAgent(context_providers=[goal_context_provider, audit])
-    goal_session = goal_agent.agent.create_session(session_id="goal_session")
+    goal_session = goal_agent.agent.create_session(session_id=f"goal_{session_name}")
     query = "I want to create a task in Microsoft To Do"
 
     logger.info(f"Running agent with query: {query}")

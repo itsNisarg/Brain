@@ -31,7 +31,7 @@ def convert_image_to_bytes(image: Image.Image) -> bytes:
 @tool
 def take_screenshot(
     folder: str, grid_size: int = 100
-) -> tuple[bytes, bytes, tuple[int, int], str]:
+) -> tuple[bytes, bytes, int, int, int, int, str]:
     """Take a screenshot of the current screen, draw a crosshair at the mouse position,
     overlay a grid, and save the screenshot to a specified folder.
 
@@ -40,11 +40,11 @@ def take_screenshot(
         grid_size (int, optional): The size of the grid squares in pixels. Defaults to 100.
 
     Returns:
-        tuple[bytes, bytes, tuple[int, int], str]: A tuple containing the screenshot bytes, grid screenshot bytes,
-        mouse position as (x, y), and the file path of the saved screenshot.
+        tuple[bytes, bytes, int, int, int, int, str]: A tuple containing the screenshot bytes, grid screenshot bytes, screen size as (width, height),
+        mouse position as (x, y) and the file path of the saved screenshot.
 
     Example:
-        screenshot_bytes, grid_screenshot_bytes, mouse_position, file_path = take_screenshot("session_20240601_120000")
+        screenshot_bytes, grid_screenshot_bytes, mouse_position, screen_size, file_path = take_screenshot("session_20240601_120000")
     """
     screenshot = pyautogui.screenshot()
     mouse_x, mouse_y = pyautogui.position()
@@ -65,7 +65,7 @@ def take_screenshot(
             min(mouse_y + r, screenshot.height),
         ],
         outline="white",
-        fill="black",
+        fill="red",
         width=7,
     )
 
@@ -98,16 +98,17 @@ def take_screenshot(
     return (
         convert_image_to_bytes(screenshot),
         convert_image_to_bytes(grid_screenshot),
-        (mouse_x, mouse_y),
+        width, height,
+        mouse_x, mouse_y,
         file_path,
     )
 
 
 if __name__ == "__main__":
-    screenshot_bytes, grid_screenshot_bytes, mouse_position, file_path = (
+    screenshot_bytes, grid_screenshot_bytes, screen_width, screen_height, mouse_x, mouse_y, file_path = (
         take_screenshot("default_session")
     )
-    print(f"Screenshot saved to: {file_path}, Mouse position: {mouse_position}")
+    print(f"Screenshot saved to: {file_path}, Mouse position: ({mouse_x}, {mouse_y}), Screen size: ({screen_width}, {screen_height})")
     print(
         f"Screenshot bytes length: {len(screenshot_bytes)}, Grid screenshot bytes length: {len(grid_screenshot_bytes)}"
     )

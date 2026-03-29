@@ -115,6 +115,16 @@ class GoalAgent:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)-8s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[
+            logging.FileHandler(f"./sessions/default_session/brain.log"),
+            logging.StreamHandler(),
+        ],
+    )
+    
     load_dotenv()  # Load environment variables from .env file
 
     goal_agent = GoalAgent()
