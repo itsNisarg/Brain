@@ -1,4 +1,4 @@
-from brain.tools.cursor_actions import (double_click, drag_and_drop, hover,
+from brain.tools.cursor_actions import (double_click, drag_and_drop, move_hover,
                                         left_click, mouse_position,
                                         pause_mouse, right_click, scroll_down,
                                         scroll_up)
@@ -13,7 +13,7 @@ __all__ = [
     "left_click",
     "right_click",
     "double_click",
-    "hover",
+    "move_hover",
     "drag_and_drop",
     "scroll_up",
     "scroll_down",

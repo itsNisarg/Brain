@@ -270,4 +270,4 @@ def pause_keyboard(duration: int) -> None:
 
 
 if __name__ == "__main__":
-    print(typeset)
+    shortcut("win", "d")

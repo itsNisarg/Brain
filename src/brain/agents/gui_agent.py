@@ -30,7 +30,7 @@ from pydantic import BaseModel
 from brain.tools import (
     double_click,
     drag_and_drop,
-    hover,
+    move_hover,
     left_click,
     mouse_position,
     pause_keyboard,
@@ -172,12 +172,10 @@ class GUIActionAgent:
 
         if structured_data := final_result.value:
             logger.info(f"Structured data extracted.")
-            logger.info(f"Screen Caption: {structured_data.screen_caption}")
-            logger.info(f"Screen Description: {structured_data.screen_description}")
-            logger.info(f"In Process: {structured_data.in_process}")
-            logger.info(
-                f"Mouse at Right Position: {structured_data.mouse_at_right_pos}"
-            )
+            logger.info(f"Action taken: {structured_data.action_taken}")
+            logger.info(f"Tool called: {structured_data.tool_called}")
+            logger.info(f"Screen analysis goal: {structured_data.screen_analysis_goal}")
+            logger.info(f"Goal achieved: {structured_data.goal_achieved}")
             return structured_data
         else:
             logger.warning("No structured data found in the response.")
@@ -203,7 +201,7 @@ if __name__ == "__main__":
         tools=[
             double_click,
             drag_and_drop,
-            hover,
+            move_hover,
             left_click,
             mouse_position,
             pause_keyboard,

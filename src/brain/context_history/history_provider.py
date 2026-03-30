@@ -158,3 +158,56 @@ class ScreenAnalysisContextProvider(BaseHistoryProvider):
             key = session_id or "default"
         logger.info(f"Saving {len(messages)} messages to ScreenAnalysisContextProvider under key: {key}")
         self.screen_analysis_history.insert({key: [m.to_dict() for m in messages]})
+
+
+class GUIActionAgentContextProvider(BaseHistoryProvider):
+    
+    def __init__(self, db: TinyDB) -> None:
+        super().__init__("gui_action_agent_history", load_messages=True)
+        if db is None:
+            db = TinyDB(".interactions/auto_history.json")
+        self._db = db
+        self.gui_action_agent_history = self._db.table("gui_action_agent_history")
+
+    async def get_messages(
+        self,
+        session_id: str | None,
+        *,
+        state: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> list[Message]:
+        key = (
+            (state or {})
+            .get(self.source_id, {})
+            .get("history_key", session_id or "default")
+        )
+        logger.info(f"Retrieving messages from GUIActionAgentContextProvider with key: {key}")
+        if not key:
+            rows = []
+        else:
+            query = Query()
+            condition = query[key].exists()
+            docs = self.gui_action_agent_history.search(cond=condition)
+            rows = [row for doc in docs if key in doc for row in doc[key]]
+            rows = rows[-1] if rows else []  # Only return the most recent GUI action agent result for context
+        logger.info(f"Retrieved {len(rows)} messages")
+        return [Message.from_dict(row) for row in rows]
+
+    async def save_messages(
+        self,
+        session_id: str | None,
+        messages: Sequence[Message],
+        *,
+        state: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        if not messages:
+            return
+        if state is not None:
+            key = state.setdefault(self.source_id, {}).setdefault(
+                "history_key", session_id or "default"
+            )
+        else:
+            key = session_id or "default"
+        logger.info(f"Saving {len(messages)} messages to GUIActionAgentContextProvider under key: {key}")
+        self.gui_action_agent_history.insert({key: [m.to_dict() for m in messages]})

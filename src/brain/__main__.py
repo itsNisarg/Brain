@@ -10,14 +10,32 @@ from tinydb import TinyDB
 
 from brain.agents import GoalAgent, ScreenAnalysisAgent
 from brain.context_history import (GlobalAuditProvider, GoalContextProvider,
-                                   ScreenAnalysisContextProvider)
-from brain.tools import take_screenshot
+                                   ScreenAnalysisContextProvider, GUIActionAgentContextProvider)
+from brain.tools import (
+    double_click,
+    drag_and_drop,
+    move_hover,
+    left_click,
+    mouse_position,
+    pause_keyboard,
+    pause_mouse,
+    press,
+    right_click,
+    scroll_down,
+    scroll_up,
+    shortcut,
+    take_screenshot,
+    typeset,
+    typetext,
+)
 
 # Create a logger instance for this module
 logger = logging.getLogger(__name__)
 
 
 async def main(session_name: str) -> None:
+
+    # HISTORY SETUP
     # Audit DB
     logger.info("Setting up conversation history...")
     audit_db = TinyDB(
@@ -34,12 +52,21 @@ async def main(session_name: str) -> None:
         f"./learnings/screen_analysis/screen_history.json"
     )  # Separate DB for screen analysis context
 
+    # GUI Action Context DB
+    logger.info("Setting up GUI action context database...")
+    gui_action_db = TinyDB(
+        f"./learnings/gui_action/gui_action_history.json"
+    )  # Separate DB for GUI action context
+
     logger.info("Setup complete. Starting agent...")
+
+    #####################################################################################
 
     logger.info("Hello from brain!")
 
     logger.info("Initializing context providers...")
 
+    # CONTEXT PROVIDERS
     # Audit Context Provider
     audit = GlobalAuditProvider(db=audit_db)
 
@@ -49,7 +76,12 @@ async def main(session_name: str) -> None:
     # Screen Analysis Context Provider
     screen_context_provider = ScreenAnalysisContextProvider(db=screen_db)
 
+    # GUI Action Context Provider
+    gui_action_context_provider = GUIActionAgentContextProvider(db=gui_action_db)
+
     logger.info("Initialized context providers...")
+    
+    #####################################################################################
 
     # Goal Agent
     goal_agent = GoalAgent(context_providers=[goal_context_provider, audit])
@@ -59,6 +91,8 @@ async def main(session_name: str) -> None:
     logger.info(f"Running goal agent with query: {query}")
     goal_result = await goal_agent.run(query, goal_session)
     logger.info(f"Goal agent result: {goal_result}")
+
+    ####################################################################################
 
     # Screen Analysis Agent
     screen_analysis_agent = ScreenAnalysisAgent(
@@ -88,6 +122,32 @@ async def main(session_name: str) -> None:
         mouse_y=mouse_y,
     )
     logger.info(f"Screen analysis result: {screen_analysis_result}")
+
+    ####################################################################################
+
+    # GUI Action Agent
+    gui_action_agent = GoalAgent(context_providers=[gui_action_context_provider, audit], tools=[
+            double_click,
+            drag_and_drop,
+            move_hover,
+            left_click,
+            mouse_position,
+            pause_keyboard,
+            pause_mouse,
+            press,
+            right_click,
+            scroll_down,
+            scroll_up,
+            shortcut,
+            typetext,
+        ])
+    gui_action_session = gui_action_agent.agent.create_session(
+        session_id=f"gui_action_{session_name}"
+    )
+
+    logger.info("Running GUI action agent...")
+
+    logger.info(f"GUI action agent result: {gui_action_result}")
 
     logger.info(f"Agent run completed.")
 

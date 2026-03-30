@@ -11,7 +11,7 @@ __all__ = [
     "left_click",
     "right_click",
     "double_click",
-    "hover",
+    "move_hover",
     "drag_and_drop",
     "scroll_up",
     "scroll_down",
@@ -65,7 +65,7 @@ def double_click(x: int, y: int) -> None:
 
 
 @tool
-def hover(x: int, y: int) -> None:
+def move_hover(x: int, y: int) -> None:
     """Moves the cursor to the specified (x, y) coordinates
     without clicking.
     Args:
@@ -127,5 +127,5 @@ def pause_mouse(duration: int) -> None:
 
 
 if __name__ == "__main__":
-    hover(240, 1175)
+    move_hover(240, 1175)
     left_click(240, 1175)
