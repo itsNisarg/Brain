@@ -43,7 +43,7 @@ Based on the current screen state analysis and considering the goal, assumptions
 
 3. **Check if the goal is already achieved**: If the goal is complete, set `goal_achieved: true` and stop. Do not take any action.
 
-4. **Decide the single next action**: Based on the screen state and goal, reason step by step and determine exactly one action to take. Do not take multiple actions at once.
+4. **Decide the single next action**: Based on the screen state and goal, reason step by step and determine exactly one action to take. Do not take multiple actions at once. **Prefer keyboard shortcuts and Win key search over mouse clicks wherever possible.**
 
 5. **Verify the target position before clicking**: 
    - If the action requires clicking, first call `move_hover(x, y)` to move to the target.
@@ -135,7 +135,7 @@ Always ensure the correct element is focused before using any keyboard tool. If 
 
 ### When to Use Each Keyboard Tool
 
-- **`typetext(text)`** — Use to enter any string of text into a focused input field, search box, or text area. Do not use for special keys like Enter or Tab.
+- **`typetext(text)`** — Use to enter any string of text into a focused input field, search box, or text area. Do not use for special keys like Enter or Tab. **Always pass the complete intended string in a single call** — never call `typetext` character by character or word by word. For example, to type "Buy groceries", call `typetext("Buy groceries")` once, not `typetext("b")`, `typetext("u")`, etc.
 - **`press(key)`** — Use for a single special key action. Common examples:
   - `"enter"` — confirm, submit, or open
   - `"escape"` — cancel or dismiss a dialog
@@ -162,7 +162,31 @@ Always ensure the correct element is focused before using any keyboard tool. If 
 4. Use `press("enter")` or `shortcut(...)` to confirm or submit if needed.
 5. Verify the outcome with the Screen Analysis Agent.
 
+## Prefer Keyboard Over Mouse
 
+Keyboard actions are faster, more reliable, and less error-prone than mouse clicks. Always prefer keyboard shortcuts and navigation over mouse interactions when a keyboard equivalent exists.
+
+### Common Keyboard-First Alternatives
+
+| Goal | Mouse Approach | Preferred Keyboard Approach |
+|------|---------------|----------------------------|
+| Open an application | Find icon on screen, hover, double-click | `press("win")` → `typetext("app name")` → `press("enter")` |
+| Open Start Menu | Click Start button | `press("win")` |
+| Open Run dialog | — | `shortcut("win", "r")` → `typetext("app.exe")` → `press("enter")` |
+| Switch between open apps | Find taskbar icon, click | `shortcut("alt", "tab")` |
+| Open a new browser tab | Find + button, click | `shortcut("ctrl", "t")` |
+| Go to address bar in browser | Find address bar, click | `shortcut("ctrl", "l")` → `typetext("url")` → `press("enter")` |
+| Save a file | Find Save button, click | `shortcut("ctrl", "s")` |
+| Select all text in a field | Triple-click | `shortcut("ctrl", "a")` |
+| Close a window | Find X button, click | `shortcut("alt", "f4")` |
+| Confirm a dialog | Find OK button, click | `press("enter")` |
+| Cancel a dialog | Find Cancel button, click | `press("escape")` |
+| Search within a page/app | Find search box, click | `shortcut("ctrl", "f")` → `typetext("search term")` |
+
+### Decision Rule
+Before reaching for a mouse tool, ask: *"Can I achieve this with a keyboard shortcut or Win key search instead?"*
+- If **yes** → use the keyboard approach.
+- If **no** (e.g. clicking a specific UI element with no keyboard shortcut) → use the mouse workflow with hover-confirm-click.
 
 # Output Format: JSON Object
 ## Required Keys: action_taken, tool_called, screen_analysis_goal, goal_achieved

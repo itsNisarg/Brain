@@ -4,33 +4,19 @@ import os
 from datetime import datetime
 from email.mime import image
 
+from azure.identity.aio import VisualStudioCodeCredential
 from dotenv import load_dotenv
 from tinydb import TinyDB
 
 from brain.agents import GoalAgent, GUIActionAgent, ScreenAnalysisAgent
-from brain.context_history import (
-    GlobalAuditProvider,
-    GoalContextProvider,
-    GUIActionAgentContextProvider,
-    ScreenAnalysisContextProvider,
-)
-from brain.tools import (
-    double_click,
-    drag_and_drop,
-    left_click,
-    mouse_position,
-    move_hover,
-    pause_keyboard,
-    pause_mouse,
-    press,
-    right_click,
-    scroll_down,
-    scroll_up,
-    shortcut,
-    take_screenshot,
-    typeset,
-    typetext,
-)
+from brain.context_history import (GlobalAuditProvider, GoalContextProvider,
+                                   GUIActionAgentContextProvider,
+                                   ScreenAnalysisContextProvider)
+from brain.tools import (double_click, drag_and_drop, get_input, left_click,
+                         mouse_position, move_hover, pause_keyboard,
+                         pause_mouse, press, right_click, scroll_down,
+                         scroll_up, shortcut, take_screenshot, typeset,
+                         typetext)
 
 # Create a logger instance for this module
 logger = logging.getLogger(__name__)
@@ -39,6 +25,10 @@ logger = logging.getLogger(__name__)
 async def main(session_name: str) -> None:
 
     # SETUP
+    logger.info("Starting setup...")
+    cred = VisualStudioCodeCredential()
+    logger.info("Credential set up.")
+
     logger.info("Setting up agents and context providers...")
 
     # Audit Dependencies
@@ -59,7 +49,7 @@ async def main(session_name: str) -> None:
     goal_context_provider = GoalContextProvider(db=goal_db)
     logger.info("Goal context provider set up.")
     # Goal Agent
-    goal_agent = GoalAgent(context_providers=[goal_context_provider, audit])
+    goal_agent = GoalAgent(context_providers=[goal_context_provider, audit], cred=cred)
     goal_session = await goal_agent.create_session(session_id=f"goal_{session_name}")
     logger.info("Goal agent set up.")
 
@@ -74,7 +64,7 @@ async def main(session_name: str) -> None:
     logger.info("Screen analysis context provider set up.")
     # Screen Analysis Agent
     screen_analysis_agent = ScreenAnalysisAgent(
-        context_providers=[screen_context_provider, audit], tools=[]
+        context_providers=[screen_context_provider, audit], tools=[], cred=cred
     )
     screen_analysis_session = await screen_analysis_agent.create_session(
         session_id=f"screen_analysis_{session_name}"
@@ -108,6 +98,7 @@ async def main(session_name: str) -> None:
             shortcut,
             typetext,
         ],
+        cred=cred,
     )
     gui_action_session = await gui_action_agent.create_session(
         session_id=f"gui_action_{session_name}"
@@ -119,7 +110,7 @@ async def main(session_name: str) -> None:
 
     logger.info("Hello from brain!")
 
-    query = "I want to create a task in Microsoft To Do"  # TODO: replace with user input in the future
+    query = input("What would you like to achieve? ")
 
     logger.info(f"Running goal agent with query: {query}")
     goal_result = await goal_agent.run(query, goal_session)

@@ -22,7 +22,7 @@ from agent_framework import (
 )
 from agent_framework.azure import AzureAIClient, AzureOpenAIResponsesClient
 from azure.ai.projects.aio import AIProjectClient
-from azure.identity.aio import VisualStudioCodeCredential
+from azure.identity.aio import VisualStudioCodeCredential, ManagedIdentityCredential, AzureCliCredential
 from dotenv import load_dotenv
 from PIL import Image
 from pydantic import BaseModel
@@ -47,6 +47,7 @@ class ScreenAnalysisAgent:
         prompt_path: str | None = "screen_analyze.md",
         context_providers: list[BaseHistoryProvider | InMemoryHistoryProvider] = [],
         tools: list[FunctionTool] = [],
+        cred: VisualStudioCodeCredential | ManagedIdentityCredential | AzureCliCredential | None = None,
     ) -> None:
 
         logger.info("Initializing ScreenAnalysisAgent...")
@@ -61,7 +62,7 @@ class ScreenAnalysisAgent:
         else:
             self.prompt = "You are a helpful assistant that analyzes the user's screen and provides a caption, description, and other relevant information in a structured format."
 
-        self._credential = VisualStudioCodeCredential()
+        self._credential = cred
         self.agent = AzureOpenAIResponsesClient(
             project_endpoint=os.environ["FOUNDRY_PROJECT_ENDPOINT"],
             deployment_name=os.environ["VISION_AGENT"],
@@ -122,11 +123,11 @@ class ScreenAnalysisAgent:
             session=session,
         )
 
-        i = 1
-        async for chunk in result:
-            if chunk.text:
-                logger.info(f"{i} Chunks received: {chunk.text}")
-            i += 1
+        # i = 1
+        # async for chunk in result:
+        #     if chunk.text:
+        #         logger.info(f"{i} Chunks received: {chunk.text}")
+        #     i += 1
 
         final_result = await result.get_final_response()
 
@@ -158,8 +159,8 @@ if __name__ == "__main__":
     )
 
     load_dotenv()  # Load environment variables from .env file
-
-    screen_analysis_agent = ScreenAnalysisAgent()
+    cred = VisualStudioCodeCredential()  # or ManagedIdentityCredential() or AzureCliCredential()
+    screen_analysis_agent = ScreenAnalysisAgent(cred=cred)
     query = "Create a new task in Microsoft To Do."
     image, image_grid, screen_width, screen_height, mouse_x, mouse_y, filepath = (
         take_screenshot("default_session")

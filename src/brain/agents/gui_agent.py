@@ -22,7 +22,7 @@ from agent_framework import (
 )
 from agent_framework.azure import AzureAIClient, AzureOpenAIResponsesClient
 from azure.ai.projects.aio import AIProjectClient
-from azure.identity.aio import VisualStudioCodeCredential
+from azure.identity.aio import VisualStudioCodeCredential, ManagedIdentityCredential, AzureCliCredential
 from dotenv import load_dotenv
 from PIL import Image
 from pydantic import BaseModel
@@ -63,6 +63,7 @@ class GUIActionAgent:
         prompt_path: str | None = "gui_prompt.md",
         context_providers: list[BaseHistoryProvider | InMemoryHistoryProvider] = [],
         tools: list[FunctionTool] = [],
+        cred: VisualStudioCodeCredential | ManagedIdentityCredential | AzureCliCredential | None = None,
     ) -> None:
 
         logger.info("Initializing GUIActionAgent...")
@@ -77,7 +78,7 @@ class GUIActionAgent:
         else:
             self.prompt = "You are a helpful assistant that performs responsible GUI actions based on the user's instructions."
 
-        self._credential = VisualStudioCodeCredential()
+        self._credential = cred
         self.agent = AzureOpenAIResponsesClient(
             project_endpoint=os.environ["FOUNDRY_PROJECT_ENDPOINT"],
             deployment_name=os.environ["REASONING_AGENT"],
@@ -162,11 +163,11 @@ class GUIActionAgent:
             additional_options={"reasoning": {"effort": "high", "summary": "concise"}},
         )
 
-        i = 1
-        async for chunk in result:
-            if chunk.text:
-                logger.info(f"{i} Chunks received: {chunk.text}")
-            i += 1
+        # i = 1
+        # async for chunk in result:
+        #     if chunk.text:
+        #         logger.info(f"{i} Chunks received: {chunk.text}")
+        #     i += 1
 
         final_result = await result.get_final_response()
 
@@ -196,7 +197,7 @@ if __name__ == "__main__":
     )
 
     load_dotenv()  # Load environment variables from .env file
-
+    cred = VisualStudioCodeCredential()
     gui_action_agent = GUIActionAgent(
         tools=[
             double_click,
@@ -212,7 +213,8 @@ if __name__ == "__main__":
             scroll_up,
             shortcut,
             typetext,
-        ]
+        ],
+        cred = cred
     )
     goal = "Create a new task in Microsoft To Do."
     image, image_grid, screen_width, screen_height, mouse_x, mouse_y, filepath = (

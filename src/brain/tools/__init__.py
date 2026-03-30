@@ -6,6 +6,7 @@ from brain.tools.keyboard_actions import (keyboard_keylist, keyboard_keyset,
                                           pause_keyboard, press, shortcut,
                                           typeset, typetext)
 from brain.tools.screenshot import take_screenshot
+from brain.tools.gui_user_input import get_input
 
 __all__ = [
     "take_screenshot",
@@ -25,4 +26,5 @@ __all__ = [
     "keyboard_keylist",
     "keyboard_keyset",
     "typeset",
+    "get_input",
 ]

@@ -20,7 +20,7 @@ from agent_framework import (
     Message,
 )
 from agent_framework.azure import AzureOpenAIResponsesClient
-from azure.identity.aio import VisualStudioCodeCredential
+from azure.identity.aio import VisualStudioCodeCredential, ManagedIdentityCredential, AzureCliCredential
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
@@ -42,6 +42,7 @@ class GoalAgent:
         prompt_path: str | None = "goal_prompt.md",
         context_providers: list[BaseHistoryProvider | InMemoryHistoryProvider] = [],
         tools: list[FunctionTool] = [],
+        cred: VisualStudioCodeCredential | ManagedIdentityCredential | AzureCliCredential | None = None,
     ) -> None:
 
         logger.info("Initializing GoalAgent...")
@@ -56,7 +57,7 @@ class GoalAgent:
         else:
             self.prompt = "You are a helpful assistant that extracts the user's goal, assumptions, and constraints from their query and provides it in a structured format."
 
-        self._credential = VisualStudioCodeCredential()
+        self._credential = cred
         self.agent = AzureOpenAIResponsesClient(
             project_endpoint=os.environ["FOUNDRY_PROJECT_ENDPOINT"],
             deployment_name=os.environ["CHAT_AGENT"],
@@ -96,11 +97,11 @@ class GoalAgent:
             session=session,
         )
 
-        i = 1
-        async for chunk in result:
-            if chunk.text:
-                logger.info(f"{i} Chunks received: {chunk.text}")
-            i += 1
+        # i = 1
+        # async for chunk in result:
+        #     if chunk.text:
+        #         logger.info(f"{i} Chunks received: {chunk.text}")
+        #     i += 1
 
         final_result = await result.get_final_response()
 
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     )
     
     load_dotenv()  # Load environment variables from .env file
-
-    goal_agent = GoalAgent()
+    cred = VisualStudioCodeCredential()
+    goal_agent = GoalAgent(cred=cred)
     query = "I want to activate my PIM roles in Azure."
     asyncio.run(goal_agent.run(query, session=None))
