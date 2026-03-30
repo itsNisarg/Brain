@@ -6,6 +6,9 @@ It includes functions to press a key,
 import pyautogui
 from agent_framework import tool
 
+
+__all__ = ["press", "typetext", "shortcut", "pause_keyboard", "keyboard_keylist", "keyboard_keyset", "typeset"]
+
 keyboard_keylist = [
     "\t",
     "\n",

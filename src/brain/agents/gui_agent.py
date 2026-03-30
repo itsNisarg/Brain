@@ -27,29 +27,45 @@ from dotenv import load_dotenv
 from PIL import Image
 from pydantic import BaseModel
 
-from brain.tools.screenshot import take_screenshot
+from brain.tools import (
+    double_click,
+    drag_and_drop,
+    hover,
+    left_click,
+    mouse_position,
+    pause_keyboard,
+    pause_mouse,
+    press,
+    right_click,
+    scroll_down,
+    scroll_up,
+    shortcut,
+    take_screenshot,
+    typeset,
+    typetext,
+)
 
 
-class ScreenAnalysisResponseFormat(BaseModel):
+class GUIActionAgentResponseFormat(BaseModel):
     """The response format of the GoalAgent,
     which includes the goal, assumptions, and constraints.
     """
 
-    screen_caption: str = ""
-    screen_description: str = ""
-    in_process: bool | None = None
-    mouse_at_right_pos: bool | None = None
+    action_taken: str = ""
+    tool_called: str = ""
+    screen_analysis_goal: str = ""
+    goal_achieved: bool = False
 
 
-class ScreenAnalysisAgent:
+class GUIActionAgent:
     def __init__(
         self,
-        prompt_path: str | None = "screen_analyze.md",
+        prompt_path: str | None = "gui_prompt.md",
         context_providers: list[BaseHistoryProvider | InMemoryHistoryProvider] = [],
         tools: list[FunctionTool] = [],
     ) -> None:
 
-        logger.info("Initializing ScreenAnalysisAgent...")
+        logger.info("Initializing GUIActionAgent...")
 
         if (
             prompt_path is not None
@@ -59,15 +75,15 @@ class ScreenAnalysisAgent:
                 files("brain.prompts").joinpath(prompt_path).read_text(encoding="utf-8")
             )
         else:
-            self.prompt = "You are a helpful assistant that analyzes the user's screen and provides a caption, description, and other relevant information in a structured format."
+            self.prompt = "You are a helpful assistant that performs responsible GUI actions based on the user's instructions."
 
         self._credential = VisualStudioCodeCredential()
         self.agent = AzureOpenAIResponsesClient(
             project_endpoint=os.environ["FOUNDRY_PROJECT_ENDPOINT"],
-            deployment_name=os.environ["VISION_AGENT"],
+            deployment_name=os.environ["REASONING_AGENT"],
             credential=self._credential,
         ).as_agent(
-            name="ScreenAnalysisAgent",
+            name="GUIActionAgent",
             instructions=self.prompt,
             context_providers=context_providers,
             tools=tools,
@@ -86,21 +102,29 @@ class ScreenAnalysisAgent:
 
     async def run(
         self,
-        query: str | None,
         screenshot: bytes | None,
+        screenshot_grid: bytes | None,
+        screen_description: str | None,
+        goal: str | None,
+        assumptions: str | None,
+        constraints: str | None,
         session: AgentSession | None,
         screen_width: int | None = None,
         screen_height: int | None = None,
         mouse_x: int | None = None,
         mouse_y: int | None = None,
-    ) -> ScreenAnalysisResponseFormat:
-        
+        process_running: bool = False,
+        mouse_in_right_position: bool = False,
+    ) -> GUIActionAgentResponseFormat:
+
         system_message = Message(
             role="system",
             contents=[
                 Content.from_text(
                     text=f"""Screen dimensions: {screen_width}x{screen_height} with top left as (0,0) and bottom right as ({screen_width},{screen_height}).
-                    Current Mouse position: ({mouse_x}, {mouse_y}) represented as a red dot inside a white circle on the screen."""
+                    Current Mouse position: ({mouse_x}, {mouse_y}) represented as a red dot inside a white circle on the screen.
+                    Characters available for typing text: 
+                    {typeset}"""
                 ),
             ],
         )
@@ -108,9 +132,24 @@ class ScreenAnalysisAgent:
         user_message = Message(
             role="user",
             contents=[
-                Content.from_text(text=query if query else "Hi!"),
+                Content.from_text(text=goal if goal else "Hi!"),
+                Content.from_text(text=assumptions if assumptions else ""),
+                Content.from_text(text=constraints if constraints else ""),
                 Content.from_data(
                     data=screenshot if screenshot else b"", media_type="image/png"
+                ),
+                Content.from_data(
+                    data=screenshot_grid if screenshot_grid else b"",
+                    media_type="image/png",
+                ),
+                Content.from_text(
+                    text=screen_description if screen_description else ""
+                ),
+                Content.from_text(
+                    text=f"There is {'a' if process_running else 'no'} process running as of now."
+                ),
+                Content.from_text(
+                    text=f"The mouse is {'in the right position' if mouse_in_right_position else 'not in the right position'}."
                 ),
             ],
         )
@@ -118,8 +157,9 @@ class ScreenAnalysisAgent:
         result = await self.agent.run(
             [system_message, user_message],
             stream=True,
-            options={"response_format": ScreenAnalysisResponseFormat},
+            options={"response_format": GUIActionAgentResponseFormat},
             session=session,
+            additional_options={"reasoning": {"effort": "high", "summary": "concise"}},
         )
 
         i = 1
@@ -159,19 +199,41 @@ if __name__ == "__main__":
 
     load_dotenv()  # Load environment variables from .env file
 
-    screen_analysis_agent = ScreenAnalysisAgent()
-    query = "Create a new task in Microsoft To Do."
+    gui_action_agent = GUIActionAgent(
+        tools=[
+            double_click,
+            drag_and_drop,
+            hover,
+            left_click,
+            mouse_position,
+            pause_keyboard,
+            pause_mouse,
+            press,
+            right_click,
+            scroll_down,
+            scroll_up,
+            shortcut,
+            typetext,
+        ]
+    )
+    goal = "Create a new task in Microsoft To Do."
     image, image_grid, screen_width, screen_height, mouse_x, mouse_y, filepath = (
         take_screenshot("default_session")
     )
     asyncio.run(
-        screen_analysis_agent.run(
-            query=query,
+        gui_action_agent.run(
             screenshot=image,
+            screenshot_grid=image_grid,
+            screen_description="The screen shows the current screen with Microsoft To Do app in the taskbar.",
+            goal=goal,
+            assumptions="The user has access to Microsoft To Do via the app or web, is signed into a Microsoft account, and has permission to create tasks in at least one task list. The user will provide or select task details such as title, due date, and list if needed.",
+            constraints="A task cannot be created without at least a task title and an accessible list. Internet access and a valid Microsoft account session may be required depending on the platform being used.",
             session=None,
             screen_width=screen_width,
             screen_height=screen_height,
             mouse_x=mouse_x,
             mouse_y=mouse_y,
+            process_running=False,  # Example value
+            mouse_in_right_position=False,  # Example value
         )
     )

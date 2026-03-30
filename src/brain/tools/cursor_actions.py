@@ -4,8 +4,19 @@ using the pyautogui library.
 """
 
 import pyautogui
-
 from agent_framework import tool
+
+__all__ = [
+    "mouse_position",
+    "left_click",
+    "right_click",
+    "double_click",
+    "hover",
+    "drag_and_drop",
+    "scroll_up",
+    "scroll_down",
+    "pause_mouse",
+]
 
 
 @tool
