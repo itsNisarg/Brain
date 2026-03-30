@@ -132,9 +132,9 @@ class GUIActionAgent:
         user_message = Message(
             role="user",
             contents=[
-                Content.from_text(text=goal if goal else "Hi!"),
-                Content.from_text(text=assumptions if assumptions else ""),
-                Content.from_text(text=constraints if constraints else ""),
+                Content.from_text(text=f"Goal:\n{goal}" if goal else "Hi!"),
+                Content.from_text(text=f"Assumptions:\n{assumptions}" if assumptions else ""),
+                Content.from_text(text=f"Constraints:\n{constraints}" if constraints else ""),
                 Content.from_data(
                     data=screenshot if screenshot else b"", media_type="image/png"
                 ),
@@ -143,7 +143,7 @@ class GUIActionAgent:
                     media_type="image/png",
                 ),
                 Content.from_text(
-                    text=screen_description if screen_description else ""
+                    text=f"Screen Description: {screen_description}" if screen_description else ""
                 ),
                 Content.from_text(
                     text=f"There is {'a' if process_running else 'no'} process running as of now."

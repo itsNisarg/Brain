@@ -2,32 +2,20 @@ import asyncio
 import logging
 import os
 from datetime import datetime
+from email.mime import image
 
-from agent_framework import (BaseHistoryProvider, InMemoryHistoryProvider,
-                             Message)
 from dotenv import load_dotenv
 from tinydb import TinyDB
 
-from brain.agents import GoalAgent, ScreenAnalysisAgent
+from brain.agents import GoalAgent, GUIActionAgent, ScreenAnalysisAgent
 from brain.context_history import (GlobalAuditProvider, GoalContextProvider,
-                                   ScreenAnalysisContextProvider, GUIActionAgentContextProvider)
-from brain.tools import (
-    double_click,
-    drag_and_drop,
-    move_hover,
-    left_click,
-    mouse_position,
-    pause_keyboard,
-    pause_mouse,
-    press,
-    right_click,
-    scroll_down,
-    scroll_up,
-    shortcut,
-    take_screenshot,
-    typeset,
-    typetext,
-)
+                                   GUIActionAgentContextProvider,
+                                   ScreenAnalysisContextProvider)
+from brain.tools import (double_click, drag_and_drop, left_click,
+                         mouse_position, move_hover, pause_keyboard,
+                         pause_mouse, press, right_click, scroll_down,
+                         scroll_up, shortcut, take_screenshot, typeset,
+                         typetext)
 
 # Create a logger instance for this module
 logger = logging.getLogger(__name__)
@@ -80,12 +68,12 @@ async def main(session_name: str) -> None:
     gui_action_context_provider = GUIActionAgentContextProvider(db=gui_action_db)
 
     logger.info("Initialized context providers...")
-    
+
     #####################################################################################
 
     # Goal Agent
     goal_agent = GoalAgent(context_providers=[goal_context_provider, audit])
-    goal_session = goal_agent.agent.create_session(session_id=f"goal_{session_name}")
+    goal_session = await goal_agent.create_session(session_id=f"goal_{session_name}")
     query = "I want to create a task in Microsoft To Do"  # TODO: replace with user input in the future
 
     logger.info(f"Running goal agent with query: {query}")
@@ -98,9 +86,10 @@ async def main(session_name: str) -> None:
     screen_analysis_agent = ScreenAnalysisAgent(
         context_providers=[screen_context_provider, audit], tools=[]
     )
-    screen_analysis_session = screen_analysis_agent.agent.create_session(
+    screen_analysis_session = await screen_analysis_agent.create_session(
         session_id=f"screen_analysis_{session_name}"
     )
+
     (
         screenshot,
         screenshot_grid,
@@ -126,7 +115,9 @@ async def main(session_name: str) -> None:
     ####################################################################################
 
     # GUI Action Agent
-    gui_action_agent = GoalAgent(context_providers=[gui_action_context_provider, audit], tools=[
+    gui_action_agent = GUIActionAgent(
+        context_providers=[gui_action_context_provider, audit],
+        tools=[
             double_click,
             drag_and_drop,
             move_hover,
@@ -140,12 +131,37 @@ async def main(session_name: str) -> None:
             scroll_up,
             shortcut,
             typetext,
-        ])
-    gui_action_session = gui_action_agent.agent.create_session(
+        ],
+    )
+    gui_action_session = await gui_action_agent.create_session(
         session_id=f"gui_action_{session_name}"
     )
 
     logger.info("Running GUI action agent...")
+
+    gui_action_result = await gui_action_agent.run(
+        screenshot=screenshot,
+        screenshot_grid=screenshot_grid,
+        screen_description=f"{screen_analysis_result.screen_caption}\n{screen_analysis_result.screen_description}",
+        goal=goal_result.goal,
+        assumptions=goal_result.assumptions,
+        constraints=goal_result.constraints,
+        session=gui_action_session,
+        screen_width=screen_width,
+        screen_height=screen_height,
+        mouse_x=mouse_x,
+        mouse_y=mouse_y,
+        process_running=(
+            screen_analysis_result.in_process
+            if screen_analysis_result.in_process is not None
+            else False
+        ),
+        mouse_in_right_position=(
+            screen_analysis_result.mouse_at_right_pos
+            if screen_analysis_result.mouse_at_right_pos is not None
+            else False
+        ),
+    )
 
     logger.info(f"GUI action agent result: {gui_action_result}")
 
