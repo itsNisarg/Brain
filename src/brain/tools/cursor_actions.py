@@ -5,7 +5,10 @@ using the pyautogui library.
 
 import pyautogui
 
+from agent_framework import tool
 
+
+@tool
 def mouse_position() -> tuple[int, int]:
     """Returns the current position of the mouse cursor as (x, y) coordinates.
     Returns:
@@ -14,6 +17,7 @@ def mouse_position() -> tuple[int, int]:
     return pyautogui.position()
 
 
+@tool
 def left_click(x: int, y: int) -> None:
     """Performs a left click at the specified (x, y) coordinates.
     Args:
@@ -25,6 +29,7 @@ def left_click(x: int, y: int) -> None:
     pyautogui.click(x, y)
 
 
+@tool
 def right_click(x: int, y: int) -> None:
     """Performs a right click at the specified (x, y) coordinates.
     Args:
@@ -36,6 +41,7 @@ def right_click(x: int, y: int) -> None:
     pyautogui.rightClick(x, y)
 
 
+@tool
 def double_click(x: int, y: int) -> None:
     """Performs a double click at the specified (x, y) coordinates.
     Args:
@@ -47,6 +53,7 @@ def double_click(x: int, y: int) -> None:
     pyautogui.doubleClick(x, y)
 
 
+@tool
 def hover(x: int, y: int) -> None:
     """Moves the cursor to the specified (x, y) coordinates
     without clicking.
@@ -59,6 +66,7 @@ def hover(x: int, y: int) -> None:
     pyautogui.moveTo(x, y, duration=1)
 
 
+@tool
 def drag_and_drop(start_x: int, start_y: int, end_x: int, end_y: int) -> None:
     """Drags the cursor from the starting (x, y) coordinates
     to the ending (x, y) coordinates.
@@ -74,6 +82,7 @@ def drag_and_drop(start_x: int, start_y: int, end_x: int, end_y: int) -> None:
     pyautogui.dragTo(end_x, end_y, duration=2)
 
 
+@tool
 def scroll_up(amount: int) -> None:
     """Scrolls up by the specified amount.
     Args:
@@ -84,6 +93,7 @@ def scroll_up(amount: int) -> None:
     pyautogui.scroll(amount)
 
 
+@tool
 def scroll_down(amount: int) -> None:
     """Scrolls down by the specified amount.
     Args:
@@ -94,6 +104,7 @@ def scroll_down(amount: int) -> None:
     pyautogui.scroll(-amount)
 
 
+@tool
 def pause_mouse(duration: int) -> None:
     """Pauses the mouse movement for the specified duration in seconds.
     Args:

@@ -8,12 +8,10 @@ from agent_framework import (BaseHistoryProvider, InMemoryHistoryProvider,
 from dotenv import load_dotenv
 from tinydb import TinyDB
 
-from brain.agents.goal_agent import GoalAgent
-from brain.agents.screen_agent import ScreenAnalysisAgent
-from brain.context_history.history_provider import (GlobalAuditProvider,
-                                                    GoalContextProvider,
-                                                    ScreenAnalysisContextProvider)
-from brain.tools.screenshot import take_screenshot
+from brain.agents import GoalAgent, ScreenAnalysisAgent
+from brain.context_history import (GlobalAuditProvider, GoalContextProvider,
+                                   ScreenAnalysisContextProvider)
+from brain.tools import take_screenshot
 
 # Create a logger instance for this module
 logger = logging.getLogger(__name__)
@@ -56,16 +54,28 @@ async def main(session_name: str) -> None:
     # Goal Agent
     goal_agent = GoalAgent(context_providers=[goal_context_provider, audit])
     goal_session = goal_agent.agent.create_session(session_id=f"goal_{session_name}")
-    query = "I want to create a task in Microsoft To Do" # TODO: replace with user input in the future
+    query = "I want to create a task in Microsoft To Do"  # TODO: replace with user input in the future
 
     logger.info(f"Running goal agent with query: {query}")
     goal_result = await goal_agent.run(query, goal_session)
     logger.info(f"Goal agent result: {goal_result}")
 
     # Screen Analysis Agent
-    screen_analysis_agent = ScreenAnalysisAgent(context_providers=[screen_context_provider, audit], tools=[])
-    screen_analysis_session = screen_analysis_agent.agent.create_session(session_id=f"screen_analysis_{session_name}")
-    screenshot, screenshot_grid, screen_width, screen_height, mouse_x, mouse_y, filepath = take_screenshot(session_name)
+    screen_analysis_agent = ScreenAnalysisAgent(
+        context_providers=[screen_context_provider, audit], tools=[]
+    )
+    screen_analysis_session = screen_analysis_agent.agent.create_session(
+        session_id=f"screen_analysis_{session_name}"
+    )
+    (
+        screenshot,
+        screenshot_grid,
+        screen_width,
+        screen_height,
+        mouse_x,
+        mouse_y,
+        filepath,
+    ) = take_screenshot(session_name)
 
     logger.info("Running screen analysis agent...")
     screen_analysis_result = await screen_analysis_agent.run(
@@ -108,7 +118,9 @@ def run() -> None:
     logger.info(f"Session created: {session_name}")
 
     if not os.path.exists(".env"):
-        logger.warning(".env file not found. Please create a .env file with the necessary API keys.")
+        logger.warning(
+            ".env file not found. Please create a .env file with the necessary API keys."
+        )
     else:
         logger.info(".env file found.")
 

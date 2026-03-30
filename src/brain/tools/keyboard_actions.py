@@ -4,6 +4,7 @@ It includes functions to press a key,
  type a string, and perform keyboard shortcuts."""
 
 import pyautogui
+from agent_framework import tool
 
 keyboard_keylist = [
     "\t",
@@ -206,6 +207,7 @@ keyboard_keyset = set(keyboard_keylist)
 typeset = set(keyboard_keylist[:72])
 
 
+@tool
 def press(key: str) -> None:
     """
     Press a key on the keyboard.
@@ -221,6 +223,7 @@ def press(key: str) -> None:
     pyautogui.press(key)
 
 
+@tool
 def typetext(text: str) -> None:
     """
     Type a string of text.
@@ -235,6 +238,7 @@ def typetext(text: str) -> None:
     pyautogui.typewrite(text)
 
 
+@tool
 def shortcut(*keys: str) -> None:
     """Perform a keyboard shortcut by pressing multiple keys simultaneously.
     Args:
@@ -251,6 +255,7 @@ def shortcut(*keys: str) -> None:
     pyautogui.hotkey(*keys)
 
 
+@tool
 def pause_keyboard(duration: int) -> None:
     """Pauses the keyboard actions for the specified duration in seconds.
     Args:
